@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sell or Die</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#111;--card:#fff;--line:#d9d6cc;--mut:#5f5d55;--red:#d4171e;--yel:#f2ff3a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101010;--fg:#f2f0ea;--card:#1b1b1b;--line:#343434;--mut:#a09d94;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101010;--fg:#f2f0ea;--card:#1b1b1b;--line:#343434;--mut:#a09d94;color-scheme:dark}
+*{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:500 16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+h1,h2{margin:0 0 6px;font-weight:800;line-height:1.15;letter-spacing:-.01em}
+h1{font-size:24px}h2{font-size:22px}
+main{flex:1;overflow-y:auto;padding:20px 18px 12px}
+.scr{display:none}.scr.on{display:block}
+.tag{color:var(--mut);margin:0 0 16px}
+.small{font-size:14px;color:var(--mut)}
+.item{font-size:clamp(28px,8.5vw,36px);font-weight:800;line-height:1.15;background:var(--card);border:1px solid var(--line);border-left:8px solid var(--yel);border-radius:12px;padding:18px;margin:8px 0 18px}
+.btn{display:block;width:100%;min-height:54px;border:2px solid var(--red);border-radius:14px;padding:12px 16px;font:inherit;font-weight:700;font-size:17px;background:var(--red);color:#fff;cursor:pointer;margin:10px 0}
+.btn.g{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn.g.sel{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+.btn.sm{min-height:44px;font-size:15px;margin:0;width:auto;flex:1}
+.btn:disabled{opacity:.4}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.count{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;margin-bottom:8px}
+nav{display:flex;gap:4px;padding:8px 8px 10px;border-top:1px solid var(--line);background:var(--bg)}
+nav button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:13px;font-weight:600;padding:10px 0;border-radius:10px;cursor:pointer}
+nav button.on{color:var(--fg);box-shadow:inset 0 -3px 0 var(--red)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:10px 0;touch-action:pan-y;user-select:none;position:relative}
+.row{display:flex;gap:10px;align-items:center}
+.wave{display:flex;gap:3px;align-items:center;height:44px;flex:1}
+.wave i{flex:1;background:var(--mut);border-radius:3px;display:block}
+.play{width:56px;height:56px;border-radius:50%;border:2px solid var(--fg);background:var(--card);color:var(--fg);font-size:18px;cursor:pointer;flex:none}
+.stamp{pointer-events:none;position:absolute;top:12px;font-weight:800;font-size:22px;opacity:0;border:3px solid;border-radius:8px;padding:2px 8px}
+.link{background:none;border:0;color:var(--mut);text-decoration:underline;font:inherit;font-size:14px;cursor:pointer;padding:10px 0}
+.stat{display:flex;gap:10px}.stat div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:13px;color:var(--mut)}
+.stat b{display:block;font-size:28px;color:var(--fg)}
+input,select{width:100%;min-height:48px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit}
+.rec{display:flex;align-items:center;justify-content:center;position:relative;margin:6px 0}
+.ring{width:min(70vw,260px)}
+.rec button{position:absolute;width:60%;aspect-ratio:1;border-radius:50%;border:0;background:var(--red);color:#fff;font:inherit;font-weight:800;font-size:20px;cursor:pointer}
+.sec{font-size:44px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.langs{display:flex;gap:8px;margin:12px 0}.lg{flex:1;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg);font:inherit;font-weight:700;cursor:pointer}.lg.on{background:var(--fg);color:var(--bg)}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 12px;margin:4px 4px 4px 0;background:var(--card)}
+.chip button{border:0;background:none;color:var(--mut);font-size:18px;cursor:pointer}
+#wel{position:fixed;inset:0;background:var(--bg);z-index:5;padding:max(28px,env(safe-area-inset-top)) 20px 20px;max-width:480px;margin:0 auto;overflow-y:auto}
+.meter{height:8px;background:var(--line);border-radius:4px;margin:8px 0;overflow:hidden}.meter i{display:block;height:100%;width:0;background:var(--red)}
+details.tx{margin-top:6px}details.tx summary{cursor:pointer;color:var(--mut);font-size:14px;padding:8px 0;text-decoration:underline}details.tx p{margin:4px 0 0}
+textarea{width:100%;min-height:76px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;margin-bottom:6px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+[hidden]{display:none!important}
+.twist{background:var(--yel);color:#111;border-radius:12px;padding:12px 14px;font-weight:700;margin:6px 0 16px}
+.about{line-height:1.5;margin:6px 0 12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+<div id="wel">
+  <h1>Sell or Die</h1><p class="tag" data-i="tag"></p>
+  <div class="langs"><button class="lg" data-l="en">English</button><button class="lg" data-l="ru">Русский</button><button class="lg" data-l="lt">Lietuvių</button></div>
+  <h2 data-i="wtitle"></h2><p class="tag" data-i="wsub"></p>
+  <button class="btn" id="wg" data-i="gbtn"></button>
+  <button class="btn g" id="we" data-i="ebtn"></button>
+  <div id="emb" hidden><input id="wem" type="email" autocomplete="email" inputmode="email" data-ph="emailph" aria-label="Email"><button class="btn" id="wsend" data-i="sendlink"></button></div>
+  <div class="small" style="text-align:center;margin:14px 0 8px" data-i="or"></div>
+  <input id="wnick" maxlength="16" data-ph="nickph" aria-label="Nickname">
+  <button class="btn g" id="wgo" data-i="wbtn"></button>
+</div>
+<main>
+<section id="home" class="scr on">
+  <h1>Sell or Die</h1><p class="tag" data-i="tag"></p>
+  <div class="small" data-i="today"></div><div class="item" id="item"></div>
+  <div class="small" data-i="twistlbl"></div><div class="twist" id="twist"></div>
+  <div class="small" data-i="next"></div><div class="count" id="cd"></div>
+  <button class="btn" id="goRec"></button>
+  <button class="btn g" id="goFeed" data-i="judge"></button>
+  <button class="btn g" id="share" data-i="share"></button>
+</section>
+<section id="rec" class="scr">
+  <h2 id="recItem"></h2><p class="twist" id="recTwist" hidden></p><p class="tag" id="recHint"></p>
+  <select id="micSel" hidden aria-label="Microphone" style="margin-bottom:8px"></select><div class="rec"><svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--line)" stroke-width="6"/><circle id="arc" cx="60" cy="60" r="54" fill="none" stroke="#d4171e" stroke-width="6" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/></svg><button id="recBtn"></button></div>
+  <div class="sec" id="sec">0:15</div><div class="meter"><i id="lvl"></i></div>
+  <button class="btn g" id="uplBtn" hidden data-i="upl"></button><input type="file" id="file" accept="audio/*,video/*" hidden><button class="btn g" id="openBr" hidden data-i="openbr"></button>
+  <div id="after" hidden><div class="small" data-i="txlbl"></div><textarea id="rtext" maxlength="400" aria-label="Text"></textarea><button class="btn g" id="prev" data-i="playme"></button><button class="btn" id="post"></button><button class="btn g" id="redo"></button></div>
+  <button class="link" id="recBack" data-i="back"></button>
+</section>
+<section id="feed" class="scr">
+  <h2 data-i="ftitle"></h2><p class="tag" id="feedTag"></p>
+  <div id="stack"></div>
+  <div class="row" id="vbtns"><button class="btn g" id="dead" style="margin:0"></button><button class="btn" id="sold" style="margin:0"></button></div>
+</section>
+<section id="results" class="scr">
+  <h2 data-i="rtitle"></h2><p class="tag" id="yItem"></p>
+  <div id="podium"></div><div class="card" id="mine"></div>
+  <button class="btn g" id="ff" data-i="ff"></button>
+</section>
+<section id="top" class="scr"><h2 data-i="ttitle"></h2><p class="tag" data-i="tsub"></p><div id="topList"></div></section>
+<section id="friends" class="scr"><h2 data-i="nf"></h2><div id="fbody"></div></section>
+<section id="me" class="scr">
+  <h2 id="nick"></h2><div class="small" id="acct"></div><button class="btn g" id="acctBtn" style="margin:8px 0 14px"></button>
+  <div class="stat"><div><b id="stStreak">0</b><span data-i="streak"></span></div><div><b id="stWins">0</b><span data-i="wins"></span></div><div><b id="stVotes">0</b><span data-i="vts"></span></div></div>
+  <p></p><input id="nickIn" maxlength="16" data-ph="nickph" aria-label="Nickname">
+  <div class="small" style="margin-top:14px" data-i="lang"></div>
+  <div class="langs"><button class="lg" data-l="en">English</button><button class="lg" data-l="ru">Русский</button><button class="lg" data-l="lt">Lietuvių</button></div>
+  <button class="btn g" id="theme" data-i="theme"></button>
+  <h2 style="font-size:18px;margin-top:18px" data-i="abouth"></h2><p class="about" data-i="aboutp"></p>
+  <h2 style="font-size:18px;margin-top:18px" data-i="hist"></h2><div id="hist"></div>
+  <button class="link" id="resLink" data-i="rtitle"></button>
+</section>
+</main>
+<nav id="nav"><button data-s="home" data-i="nh"></button><button data-s="feed" data-i="nj"></button><button data-s="friends" data-i="nf"></button><button data-s="top" data-i="nt"></button><button data-s="me" data-i="nm"></button></nav>
+<div class="toast" id="toast"></div>
+<script>
+const L={
+gbtn:["Continue with Google","Войти через Google","Tęsti su Google"],
+ebtn:["Continue with email","Войти по почте","Tęsti su el. paštu"],
+emailph:["Your email","Ваша почта","Jūsų el. paštas"],
+sendlink:["Send sign-in link","Отправить ссылку для входа","Siųsti prisijungimo nuorodą"],
+linksent:["Link sent. Check your inbox.","Ссылка отправлена. Проверьте почту.","Nuoroda išsiųsta. Patikrinkite paštą."],
+or:["or","или","arba"],
+noauth:["Sign-in is not set up yet. Continue anonymously.","Вход ещё не настроен. Продолжите анонимно.","Prisijungimas dar nesukonfigūruotas. Tęskite anonimiškai."],
+bademail:["Enter a valid email.","Введите корректную почту.","Įveskite teisingą el. paštą."],
+askemail:["Confirm your email","Подтвердите почту","Patvirtinkite el. paštą"],
+twistlbl:["This hour’s twist","Условие этого часа","Šios valandos sąlyga"],
+twist:["Twist","Условие","Sąlyga"],
+share:["Share this challenge","Поделиться заданием","Dalytis užduotimi"],
+sharetxt:["Sell “{0}” in 15 seconds. Twist: {1} Can you do it?","Продай «{0}» за 15 секунд. Условие: {1} Сможешь?","Parduokite „{0}“ per 15 sekundžių. Sąlyga: {1} Pavyks?"],
+copied2:["Challenge copied","Задание скопировано","Užduotis nukopijuota"],
+newitem:["New item! The clock reset.","Новый предмет!","Naujas daiktas!"],
+late:["Time ran out: a new item started. Pitch the new one.","Время вышло: начался новый предмет. Питчуйте новый.","Laikas baigėsi: prasidėjo naujas daiktas. Pristatykite naują."],
+signout:["Sign out","Выйти","Atsijungti"],signin:["Sign in","Войти","Prisijungti"],
+signedas:["Signed in as {0}","Вы вошли как {0}","Prisijungta kaip {0}"],
+anonacct:["Playing anonymously","Вы играете анонимно","Žaidžiate anonimiškai"],
+abouth:["About","О проекте","Apie projektą"],
+aboutp:["Selling is thinking under pressure. In 15 seconds you have to find one strong idea, say it clearly, and make a stranger care. Practicing this every hour trains quick thinking, clear speech and persuasion. These skills help in interviews, startups, negotiations and everyday life. I built Sell or Die as a student of a sales course, because the best way to learn selling is to do it often, and it should be fun.","Продажа — это мышление под давлением. За 15 секунд нужно найти одну сильную идею, чётко её сказать и заинтересовать незнакомца. Если тренироваться каждый час, развиваются быстрое мышление, ясная речь и умение убеждать. Эти навыки пригодятся на собеседованиях, в стартапах, на переговорах и в обычной жизни. Я сделал Sell or Die как студент курса по продажам: лучше всего учишься, когда делаешь это часто, и пусть это будет весело.","Pardavimai – tai mąstymas spaudžiant laikui. Per 15 sekundžių reikia rasti vieną stiprią idėją, aiškiai ją pasakyti ir sudominti nepažįstamąjį. Treniruojantis kas valandą lavėja greitas mąstymas, aiški kalba ir įtikinimo gebėjimai. Šie įgūdžiai praverčia pokalbiuose dėl darbo, startuoliuose, derybose ir kasdienybėje. Sukūriau „Sell or Die“ kaip pardavimų kurso studentas: geriausiai mokaisi darydamas tai dažnai, ir tegul tai bus smagu."],
+tag:["Sell it or die.","Продай или умри.","Parduok arba žūk."],
+today:["This hour’s item","Предмет этого часа","Šios valandos daiktas"],next:["Next item in","Следующий через","Kitas po"],
+pitch:["Record my pitch","Записать питч","Įrašyti pristatymą"],posted:["Pitch posted","Питч опубликован","Pristatymas paskelbtas"],
+judge:["Judge pitches","Оценить питчи","Vertinti pristatymus"],
+rechint:["15 seconds. One re-record allowed.","15 секунд. Одна перезапись.","15 sekundžių. Vienas perrašymas."],
+start:["Start","Старт","Pradėti"],stop:["Stop","Стоп","Stop"],playme:["Play my pitch","Прослушать","Paklausyti"],
+post:["Post pitch","Опубликовать","Paskelbti"],redo:["Re-record ({0} left)","Перезаписать (осталось {0})","Perrašyti (liko {0})"],
+back:["Back","Назад","Atgal"],go:["Recording. Make your pitch.","Идёт запись. Говорите.","Įrašoma. Kalbėkite."],
+nomic:["Microphone unavailable. Allow access, or use your phone’s recorder below.","Микрофон недоступен. Разрешите доступ или используйте запись телефона ниже.","Mikrofonas nepasiekiamas. Leiskite prieigą arba naudokite telefono įrašymą žemiau."],
+upl:["Upload or record a file","Загрузить или записать файл","Įkelti arba įrašyti failą"],
+openbr:["Open in browser","Открыть в браузере","Atidaryti naršyklėje"],
+copied:["Link copied. Paste it into your phone’s browser (Chrome or Safari).","Ссылка скопирована. Вставьте её в браузере телефона (Chrome или Safari).","Nuoroda nukopijuota. Įklijuokite ją telefono naršyklėje (Chrome arba Safari)."],
+micframe:["This chat window blocks the microphone. Open the page in your phone’s browser (Chrome or Safari) and record there.","Это окно чата блокирует микрофон. Откройте страницу в браузере телефона (Chrome или Safari) и записывайте там.","Šis pokalbio langas blokuoja mikrofoną. Atidarykite puslapį telefono naršyklėje (Chrome arba Safari) ir įrašykite ten."],
+long:["Too long. Maximum 15 seconds.","Слишком длинно. Максимум 15 секунд.","Per ilgai. Daugiausia 15 sekundžių."],
+ftitle:["Sell or Die?","Sell or Die?","Sell or Die?"],
+locked:["Post your own pitch first to start voting.","Сначала опубликуйте свой питч, чтобы голосовать.","Pirmiausia paskelbkite savo pristatymą, kad galėtumėte balsuoti."],
+sold:["Sell","Sell","Sell"],dead:["Die","Die","Die"],
+swipe:["Swipe right to Sell, left to Die.","Свайп вправо: Sell, влево: Die.","Dešinėn: Sell, kairėn: Die."],
+anon:["Anonymous pitch · {0} left","Анонимный питч · осталось {0}","Anonimas · liko {0}"],
+report:["Report","Пожаловаться","Pranešti"],reported:["Reported. Pitch hidden.","Жалоба отправлена. Питч скрыт.","Pranešta. Pristatymas paslėptas."],
+empty:["You have judged all pitches. New ones arrive every hour.","Вы оценили все питчи. Новые появятся каждый час.","Įvertinote visus. Naujų atsiras kas valandą."],
+ptoast:["Posted. Now judge others.","Опубликовано. Теперь оценивайте других.","Paskelbta. Dabar vertinkite kitus."],
+rtitle:["Last hour’s results","Итоги прошлого часа","Praėjusios valandos rezultatai"],
+ritem:["Item: {0}","Предмет: {0}","Daiktas: {0}"],
+rpend:["Your pitch is still in play. Results arrive next hour.","Ваш питч ещё в игре. Итоги будут в следующем часу.","Jūsų pristatymas dar žaidime. Rezultatai kitą valandą."],
+rrank:["Your pitch ranked #{0} of 9.","Ваш питч занял {0} место из 9.","Jūsų pristatymas užėmė {0} vietą iš 9."],
+ff:["Skip to next hour (demo)","Перейти к следующему часу (демо)","Pereiti į kitą valandą (demo)"],
+pct:["{0}% Sell · {1} votes","{0}% Sell · голосов: {1}","{0}% Sell · balsų: {1}"],
+ttitle:["Weekly Top 10","Топ-10 недели","Savaitės TOP 10"],
+tsub:["Ranked by confidence, so a few votes cannot beat many.","Рейтинг учитывает число голосов: несколько голосов не обгонят много.","Reitingas atsižvelgia į balsų skaičių: keli balsai neaplenks daugelio."],
+streak:["Hour streak","Часов подряд","Valandų iš eilės"],wins:["Wins","Победы","Pergalės"],vts:["Votes","Голоса","Balsai"],
+hist:["Pitch history","История питчей","Pristatymų istorija"],nohist:["No pitches yet.","Питчей пока нет.","Pristatymų dar nėra."],
+inplay:["In play","В игре","Žaidime"],rank:["Rank #{0}","Место {0}","{0} vieta"],
+nickph:["Nickname (optional)","Никнейм (необязательно)","Slapyvardis (neprivaloma)"],saved:["Saved.","Сохранено.","Išsaugota."],
+theme:["Light / dark","Светлая / тёмная","Šviesi / tamsi"],lang:["Language","Язык","Kalba"],
+nh:["Home","Главная","Pradžia"],nj:["Judge","Оценка","Vertinti"],nf:["Friends","Друзья","Draugai"],nt:["Top 10","Топ-10","TOP 10"],nm:["Profile","Профиль","Profilis"],
+wtitle:["Sign in to play","Войдите, чтобы играть","Prisijunkite, kad žaistumėte"],
+wsub:["Sign in with your account, or jump in anonymously.","Войдите через аккаунт или зайдите анонимно.","Prisijunkite su paskyra arba žaiskite anonimiškai."],
+wbtn:["Continue anonymously","Продолжить анонимно","Tęsti anonimiškai"],
+fsub:["3 to 6 friends, one phone. Everyone gets a different item and records a pitch. Then each person votes for the best and the worst.","От 3 до 6 друзей, один телефон. Каждому достаётся свой предмет, все записывают питч. Затем каждый голосует за лучший и худший.","3–6 draugai, vienas telefonas. Kiekvienas gauna savo daiktą ir įrašo pristatymą. Tada kiekvienas balsuoja už geriausią ir blogiausią."],
+fname:["Player name","Имя игрока","Žaidėjo vardas"],fadd:["Add","Добавить","Pridėti"],
+fstart:["Start round","Начать раунд","Pradėti raundą"],fmin:["Add at least 3 players.","Добавьте минимум 3 игроков.","Pridėkite bent 3 žaidėjus."],
+fpass:["Pass the phone to {0}","Передайте телефон: {0}","Perduokite telefoną: {0}"],fword:["Your item","Ваш предмет","Jūsų daiktas"],
+fready:["I’m ready, record","Готов, записывать","Pasiruošęs, įrašyti"],
+fvote:["{0}, vote","{0}, голосуйте","{0}, balsuokite"],
+fvsub:["Pitches are labeled by item, not by author. Choose one best and one worst.","Питчи подписаны предметом, а не автором. Выберите один лучший и один худший.","Pristatymai pažymėti daiktu, o ne autoriumi. Pasirinkite geriausią ir blogiausią."],
+best:["Best","Лучший","Geriausias"],worst:["Worst","Худший","Blogiausias"],submit:["Submit votes","Отправить голоса","Pateikti balsus"],
+fres:["Final ranking","Итоговый рейтинг","Galutinis reitingas"],fnew:["New game","Новая игра","Naujas žaidimas"],
+fnote:["Online rooms for friends on separate phones need the backend.","Онлайн-комнаты для друзей на разных телефонах появятся с бэкендом.","Internetiniai kambariai skirtinguose telefonuose atsiras su serveriu."],
+pts:["{0} pts","{0} очк.","{0} tšk."],
+text:["Text","Текст","Tekstas"],notext:["No text for this pitch.","Для этого питча нет текста.","Šiam pristatymui teksto nėra."],
+txlbl:["Text of your pitch (edit if needed)","Текст вашего питча (при необходимости исправьте)","Jūsų pristatymo tekstas (pataisykite, jei reikia)"],
+mic:["Microphone","Микрофон","Mikrofonas"],
+micblock:["Microphone is blocked. Allow it in the browser’s site settings, then tap Start.","Микрофон заблокирован. Разрешите его в настройках сайта в браузере и нажмите «Старт».","Mikrofonas užblokuotas. Leiskite jį naršyklės svetainės nustatymuose ir spauskite „Pradėti“."],
+micnone:["No microphone found. Connect a headset and tap Start again.","Микрофон не найден. Подключите гарнитуру и нажмите «Старт» снова.","Mikrofono nerasta. Prijunkite ausines ir vėl spauskite „Pradėti“."],
+micbusy:["The microphone is used by another app. Close it and try again.","Микрофон занят другим приложением. Закройте его и повторите.","Mikrofoną naudoja kita programa. Uždarykite ją ir bandykite dar kartą."],
+silent:["No sound detected. Choose another microphone above or check your headset.","Звука нет. Выберите другой микрофон выше или проверьте гарнитуру.","Garso nėra. Pasirinkite kitą mikrofoną aukščiau arba patikrinkite ausines."]};
+const ITEMS="a comb for dragons|an umbrella for fish|a leash for a cloud|a pillow for insomniac ghosts|a calculator for goldfish|socks for a snake|a GPS for lost socks|a spoon for soup that is already empty|a helmet for an egg|sunscreen for vampires|a ladder to the moon|a doorbell for a black hole|a parachute for a snail|a toothbrush for a crocodile|glasses for a bat|an alarm clock for a sloth|a diary for a houseplant|a hat for a tall building|a raincoat for a desert|a lock for a rumor|a mirror for a vampire|a fan for a penguin|a map of your own living room|a bicycle for a centipede|earplugs for a rooster|a wallet for a seagull|a cradle for a grown-up|a passport for a shadow|a telescope for the nearby|a broom for a witch’s cat|a tie for a giraffe|a pen that only writes apologies|a bell for a silent monk|a trampoline for a turtle|a gym membership for a couch|a phone for a hermit|an oven mitt for a volcano|boots for a centaur|a compass that points to snacks|a candle for the sun|a seatbelt for a rollercoaster|shampoo for the bald eagle|a bed for a sleepwalker|a lawn mower for the ocean|a saddle for a mosquito|a bathtub for a cat|a megaphone for a mouse|a smoke detector for a dragon|a suitcase for a goldfish vacation|a fork for a river|a vaccine against Mondays|a gift card for a ghost|a thermos for a snowman|a necklace for a snake|a license for an imaginary friend|a scarf for a lighthouse|a mop for the rain|a drum for an introvert|a clock that only shows lunch|a hammock for a bat|a safe for your secrets, no secrets included|a swimsuit for a cactus|a pillowcase for a pumpkin|a pager for a pigeon|a fridge for a polar bear|a straw for a giraffe’s smoothie|a hairnet for a lion|a haircut for a wig|an elevator for an ant|a baby monitor for a mountain|a doghouse for a wolf in sheep’s clothing|a bookmark for a goldfish novel|a recipe for disaster, ready to serve|a diploma for a parrot|a lifejacket for a submarine|a handbag for a kangaroo|an anchor for a balloon|a password for a snail’s house|a time machine that only goes to Tuesday|a spare tire for a unicycle|a gravestone for a dead battery|a perfume for a skunk|a ruler for infinity|a trophy for second place|a coat for a ghost in winter|a bell for a cat who hates birds|a tent for a hermit crab|a jetpack for a chicken|a tuxedo for a pigeon|a fax machine for a time traveler|a keyboard for a pianist cat|a flashlight for the sun|a vacuum for a black hole’s mess|a hot-water bottle for a dragon|a mailbox for a message in a bottle|a pair of gloves for an octopus|a cane for a young tortoise|a washing machine for rain clouds|a business card for a mime|a pocket for a ghost|a lullaby for a fire alarm".split("|");
+const TR={ru:"расчёска для драконов|зонт для рыб|поводок для облака|подушка для призраков с бессонницей|калькулятор для золотой рыбки|носки для змеи|GPS для потерянных носков|ложка для уже пустого супа|шлем для яйца|солнцезащитный крем для вампиров|лестница на Луну|дверной звонок для чёрной дыры|парашют для улитки|зубная щётка для крокодила|очки для летучей мыши|будильник для ленивца|дневник для комнатного растения|шляпа для небоскрёба|дождевик для пустыни|замок для сплетен|зеркало для вампира|вентилятор для пингвина|карта вашей собственной гостиной|велосипед для сороконожки|беруши для петуха|кошелёк для чайки|колыбель для взрослого|паспорт для тени|телескоп для того, что рядом|метла для кошки ведьмы".split("|"),
+lt:"šukos drakonams|skėtis žuvims|pavadėlis debesiui|pagalvė nemiga kenčiantiems vaiduokliams|skaičiuotuvas auksinei žuvelei|kojinės gyvatei|GPS pamestoms kojinėms|šaukštas jau tuščiai sriubai|šalmas kiaušiniui|apsauginis kremas nuo saulės vampyrams|kopėčios į Mėnulį|durų skambutis juodajai skylei|parašiutas sraigei|dantų šepetėlis krokodilui|akiniai šikšnosparniui|žadintuvas tinginiui|dienoraštis kambariniam augalui|skrybėlė dangoraižiui|lietpaltis dykumai|spyna paskaloms|veidrodis vampyrui|ventiliatorius pingvinui|tavo svetainės žemėlapis|dviratis šimtakojui|ausų kamšteliai gaidžiui|piniginė žuvėdrai|lopšys suaugusiajam|pasas šešėliui|teleskopas tam, kas šalia|šluota raganos katei".split("|")};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let lang=(navigator.language||"en").slice(0,2);if(!["ru","lt"].includes(lang))lang="en";
+const li=()=>({en:0,ru:1,lt:2})[lang];
+const t=(k,...a)=>L[k][li()].replace(/\{(\d)\}/g,(m,i)=>a[i]);
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const iName=i=>cap((TR[lang]&&TR[lang][i])||ITEMS[i]);
+const txt=(s,o)=>`<details class="tx"${o?" open":""}><summary>${t("text")}</summary><p>${s?esc(s):t("notext")}</p></details>`;
+const HOUR=36e5;let off=0;const now=()=>Date.now()+off;
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+let STEP=7;while(gcd(STEP,ITEMS.length)!==1)STEP++;
+const idxFor=s=>(s*STEP)%ITEMS.length;
+let slot=Math.floor(now()/HOUR),dIdx=idxFor(slot),yIdx=idxFor(slot-1);
+const TW=[["Pitch it like a late-night infomercial.","Продай как в ночной телемагазинной рекламе.","Pristatykite kaip naktinę TV reklamą."],
+["Pitch it as a detective revealing the truth.","Продай как детектив, раскрывающий правду.","Pristatykite kaip detektyvas, atskleidžiantis tiesą."],
+["Pitch it to a very skeptical grandma.","Продай очень скептичной бабушке.","Parduokite labai skeptiškai senelei."],
+["Pitch it in a whisper, like a secret.","Продай шёпотом, как секрет.","Pristatykite šnibždėdami, lyg paslaptį."],
+["Pitch it as if it is the last one on Earth.","Продай так, будто он последний на Земле.","Pristatykite lyg tai paskutinis Žemėje."],
+["Pitch it like a sports commentator.","Продай как спортивный комментатор.","Pristatykite kaip sporto komentatorius."],
+["You must say the word “banana”.","Обязательно скажи слово «банан».","Privalote pasakyti žodį „bananas“."],
+["Pitch it to a dragon with a tiny budget.","Продай дракону с крошечным бюджетом.","Parduokite drakonui su mažu biudžetu."],
+["Pitch it as a luxury brand.","Продай как люксовый бренд.","Pristatykite kaip prabangos prekės ženklą."],
+["Pitch it to your future self.","Продай себе из будущего.","Parduokite sau iš ateities."],
+["Start with a problem nobody knew they had.","Начни с проблемы, о которой никто не знал.","Pradėkite nuo problemos, apie kurią niekas nežinojo."],
+["Pitch it as a movie trailer.","Продай как трейлер фильма.","Pristatykite kaip filmo anonsą."]];
+const twIdx=s=>(Math.imul(s,2654435761)>>>0)%TW.length;
+const twistText=(s=slot)=>TW[twIdx(s)][li()];
+function rng(seed){let x=(Math.imul(seed,2654435761)>>>0)||1;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296}}
+const NAMES=["Ace","Moth","Kit","Mimi","Dex","Rae","Ivy","Sol","Jo","Gus","Lena","Pia"];
+const rw=()=>Array.from({length:24},()=>20+Math.random()*80);
+const PT=["Ladies and gentlemen, meet {item}. Nobody asked for it, nobody needs it, and yet here it is, shining in all its pointless glory. Buy it before it buys you.",
+"{Item}. Ten out of ten experts agree it exists. The eleventh expert was my cousin. Order now and I will throw in a second one that does absolutely nothing.",
+"Are you tired of your boring life? Of course you are. That is why you need {item}. It will not fix anything, but it will look amazing on your shelf.",
+"I have been selling {item} for twenty years, which is impossible because I invented it yesterday. That is how powerful this product is. Trust me completely.",
+"Imagine waking up tomorrow with {item}. Your neighbors will be jealous, your mother will be confused, and your cat will finally respect you.",
+"This is not just {item}. It is a lifestyle, a promise, and a mild threat. Buy it now and I will never mention it again. Probably.",
+"Warning: owning {item} may cause sudden happiness, strange looks, and an urge to tell strangers about it. Side effects are permanent. Do you accept? Great.",
+"Forget everything you know about money. For the price of one sandwich, you get {item}. The sandwich was never going to change your life. This might.",
+"Last one in stock! Technically the only one, but still. I carried {item} through two floods, one cat, and my uncle, and it never broke. Indestructible.",
+"Do you want to be rich? Buy {item}. Do you want to be happy? Buy {item}. Do you want to be left alone? Also buy {item}. Problem solved.",
+"Scientists say nothing about {item}, and that is the best part. No studies, no warnings, no refunds. Just pure confidence and a very real product.",
+"Dear customer, you have been selected to own {item}. This offer expires when I get bored, which is in about ten seconds. Choose wisely."];
+const PN=["Moth","Gus","Lena","Bob","Pia","Kit","Mimi","Dex","Rae","Ivy","Sol","Jo"];
+function makePitches(){const g=rng(slot*7+1),sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(g()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+ const ts=sh(PT),ns=sh(PN),it=ITEMS[dIdx];
+ return ts.slice(0,6).map((tp,i)=>({nick:ns[i],text:tp.replace(/\{Item\}/g,cap(it)).replace(/\{item\}/g,it),sold:5+Math.floor(g()*30),dead:3+Math.floor(g()*20),w:rw()}))}
+const S={nick:"Anon"+(100+Math.floor(Math.random()*900)),posted:false,rerec:1,streak:0,wins:0,votes:0,hist:[],user:null,
+ pitches:[]};
+S.pitches=makePitches();
+const weekly=[["Ace",3,"Boo hoo. Sleep tight, forever, which is the point.",212,19],["Mimi",10,"One small step for you. Fourteen million for the ladder.",180,22],["Dex",11,"Nobody ever answered. Be the first to not hear.",96,8],["Rae",2,"Walk your weather. Pick up after it.",150,31],["Ivy",4,"Three seconds of memory, infinite math.",120,35],["Sol",9,"SPF fifty. Because forever is a long time to burn.",88,12],["Jo",15,"Gently. Over the next four hours.",77,24]];
+function wilson(s,n){if(!n)return 0;const z=1.96,p=s/n;return(p+z*z/(2*n)-z*Math.sqrt((p*(1-p)+z*z/(4*n))/n))/(1+z*z/n)}
+function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1800)}
+let cur="home";
+function applyLang(){document.documentElement.lang=lang;$$("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));$$("[data-ph]").forEach(e=>e.placeholder=t(e.dataset.ph));$$(".lg").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));if(cur!=="rec")show(cur)}
+function show(n){cur=n;stopPlay();$$(".scr").forEach(e=>e.classList.toggle("on",e.id===n));$$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.s===n));$("#nav").style.display=n==="rec"?"none":"flex";const R={feed:renderFeed,top:renderTop,me:renderMe,results:renderResults,home:renderHome,friends:renderFriends};R[n]&&R[n]();$("main").scrollTop=0}
+function renderHome(){$("#item").textContent=iName(dIdx)+".";$("#twist").textContent=twistText();$("#goRec").textContent=t(S.posted?"posted":"pitch");$("#goRec").disabled=S.posted}
+function rollover(){const s=Math.floor(now()/HOUR);if(s===slot)return;slot=s;dIdx=idxFor(slot);yIdx=idxFor(slot-1);S.posted=false;S.pitches=makePitches();
+ const h=S.hist[0];if(h&&h.slot===slot-1&&h.rank==null){h.rank=1+Math.floor(Math.random()*9);if(h.rank<=3)S.wins++}
+ toast(t("newitem"));if(["home","feed","results"].includes(cur))show(cur)}
+function tick(){rollover();const r=(slot+1)*HOUR-now();$("#cd").textContent=String(Math.floor(r/6e4)).padStart(2,"0")+":"+String(Math.floor(r%6e4/1e3)).padStart(2,"0")}
+setInterval(tick,1000);tick();
+/* playback */
+/* voices: every pitch is read by a different voice (woman, man, deep, squeaky, other) */
+let VOICES=[];function loadVoices(){try{VOICES=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang))}catch(e){VOICES=[]}}
+if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+const FEM=/female|zira|samantha|karen|susan|hazel|jenny|aria|victoria|moira|tessa|fiona|allison|ava|serena|libby|sonia|natasha|google us english/i,MAL=/(^|[^a-z])male|david|mark|daniel|alex|fred|george|guy|ryan|james|tom|oliver|rishi|aaron|arthur|eric|davis|brian|christopher/i;
+const pickV=(re,not)=>VOICES.find(v=>re.test(v.name)&&!(not&&not.test(v.name)));
+const PROF=[{f:()=>pickV(FEM)||VOICES[0],pitch:1.15,rate:1},{f:()=>pickV(MAL,/female/i)||VOICES[1]||VOICES[0],pitch:.85,rate:1},
+ {f:()=>pickV(MAL,/female/i)||VOICES[0],pitch:.4,rate:.85},{f:()=>pickV(FEM)||VOICES[0],pitch:1.9,rate:1.15},{f:()=>VOICES[2]||VOICES[0],pitch:1,rate:1.1}];
+let VN=0;
+let audio=null,pb=null;
+function stopPlay(){audio&&audio.pause();window.speechSynthesis&&speechSynthesis.cancel();if(pb){pb.textContent="▶";pb=null}}
+function play(p,btn){const was=pb===btn;stopPlay();if(was)return;pb=btn;btn.textContent="■";const end=()=>{if(pb===btn){btn.textContent="▶";pb=null}};
+ if(p.url){audio=new Audio(p.url);audio.onended=end;audio.play().catch(end)}
+ else if(window.speechSynthesis){const pr=PROF[(p.vi!==undefined?p.vi:VN++)%PROF.length],u=new SpeechSynthesisUtterance(p.text),v=pr.f();if(v)u.voice=v;u.lang=v?v.lang:"en-US";u.pitch=pr.pitch;u.rate=pr.rate;u.onend=end;u.onerror=end;speechSynthesis.speak(u)}else end()}
+/* recorder (shared by daily pitch and friends mode) */
+let REC={},mr,chunks,stream,t0,timer,state="idle",blob=null;
+const arc=$("#arc");
+function setSec(v){$("#sec").textContent="0:"+String(Math.ceil(Math.max(0,15-v))).padStart(2,"0");arc.style.strokeDashoffset=339.3*(1-Math.min(1,v/15))}
+function resetRec(){state="idle";$("#openBr").hidden=true;REC.text="";$("#recBtn").textContent=t("start");$("#recBtn").hidden=false;$("#after").hidden=true;$("#uplBtn").hidden=true;$("#recHint").textContent=REC.rerec?t("rechint"):"";setSec(0);$("#recItem").textContent=REC.item+".";$("#recTwist").hidden=!REC.twist;$("#recTwist").textContent=REC.twist?t("twist")+": "+REC.twist:"";$("#post").textContent=t("post")}
+function openRec(item,cb,back,twist){REC={item,cb,back,twist,rerec:1};resetRec();show("rec")}
+function finishTake(b){blob=b;state="done";$("#rtext").value=REC.text?cap(REC.text):"";REC.edited=false;$("#recBtn").hidden=true;$("#uplBtn").hidden=true;$("#after").hidden=false;$("#redo").hidden=REC.rerec<1;$("#redo").textContent=t("redo",REC.rerec);$("#recHint").textContent=""}
+function noMic(k){$("#recHint").textContent=t(k||"nomic");$("#uplBtn").hidden=false;$("#openBr").hidden=k!=="micframe"}
+$("#openBr").onclick=()=>{try{navigator.clipboard.writeText(location.href)}catch(e){}toast(t("copied"));try{window.open(location.href,"_blank")}catch(e){}};
+let micId="",sr=null,srOn=false,ac=null,an=null,buf=null,peak=0;
+async function getMic(){
+ const c=id=>({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+ let s=null,err=null;
+ try{s=await navigator.mediaDevices.getUserMedia(c(micId))}catch(e){err=e}
+ if(!s&&micId&&err&&(err.name==="OverconstrainedError"||err.name==="NotFoundError")){micId="";try{s=await navigator.mediaDevices.getUserMedia(c(""));err=null}catch(e){err=e}}
+ if(!s){const n=err&&err.name;noMic(n==="NotAllowedError"||n==="SecurityError"?(window.self!==window.top?"micframe":"micblock"):n==="NotFoundError"?"micnone":n==="NotReadableError"?"micbusy":"nomic");return null}
+ listMics(s);return s}
+async function listMics(s){try{const d=(await navigator.mediaDevices.enumerateDevices()).filter(x=>x.kind==="audioinput");const sel=$("#micSel");if(d.length<2){sel.hidden=true;return}const cur=s.getAudioTracks()[0].getSettings().deviceId;sel.innerHTML=d.map((x,i)=>`<option value="${esc(x.deviceId)}"${x.deviceId===cur?" selected":""}>${esc(x.label||t("mic")+" "+(i+1))}</option>`).join("");sel.hidden=false}catch(e){}}
+$("#micSel").onchange=e=>{micId=e.target.value;if(state==="rec"){abortRec();resetRec();startRec()}};
+if(navigator.mediaDevices&&navigator.mediaDevices.addEventListener)navigator.mediaDevices.addEventListener("devicechange",()=>{if(state==="idle"&&stream&&!$("#micSel").hidden)listMics(stream)});
+function startMeter(){peak=0;try{const AC=window.AudioContext||window.webkitAudioContext;ac=new AC();ac.resume&&ac.resume();const src=ac.createMediaStreamSource(stream);an=ac.createAnalyser();an.fftSize=512;buf=new Uint8Array(an.fftSize);src.connect(an)}catch(e){an=null}}
+function stopMeter(){try{ac&&ac.close()}catch(e){}ac=null;an=null;$("#lvl").style.width="0"}
+function startSR(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;REC.text="";REC.edited=false;if(!SR)return;
+ try{sr=new SR();sr.lang={en:"en-US",ru:"ru-RU",lt:"lt-LT"}[lang];sr.continuous=true;sr.interimResults=false;
+ sr.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)REC.text+=(REC.text?" ":"")+e.results[i][0].transcript.trim();if(!REC.edited)$("#rtext").value=REC.text?cap(REC.text):""};
+ sr.onend=()=>{if(srOn)try{sr.start()}catch(x){}};sr.onerror=()=>{};srOn=true;sr.start()}catch(e){srOn=false}}
+function stopSR(){srOn=false;try{sr&&sr.stop()}catch(e){}}
+function abortRec(){clearInterval(timer);stopSR();stopMeter();if(mr&&mr.state!=="inactive"){const s0=stream;mr.onstop=()=>s0.getTracks().forEach(x=>x.stop());mr.stop()}state="idle"}
+async function startRec(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){noMic();return}
+ stream=await getMic();if(!stream)return;
+ const mt=["audio/webm;codecs=opus","audio/mp4","audio/webm","audio/ogg"].find(x=>MediaRecorder.isTypeSupported(x))||"";
+ try{mr=new MediaRecorder(stream,mt?{mimeType:mt}:{})}catch(e){stream.getTracks().forEach(x=>x.stop());noMic();return}
+ chunks=[];mr.ondataavailable=e=>e.data&&e.data.size&&chunks.push(e.data);
+ mr.onstop=()=>{stream.getTracks().forEach(x=>x.stop());finishTake(new Blob(chunks,{type:mr.mimeType||mt||"audio/mp4"}))};
+ mr.start();state="rec";t0=Date.now();$("#recBtn").textContent=t("stop");$("#recHint").textContent=t("go");startSR();startMeter();
+ timer=setInterval(()=>{const v=(Date.now()-t0)/1000;setSec(v);if(an){an.getByteTimeDomainData(buf);let m=0;for(let i=0;i<buf.length;i++)m=Math.max(m,Math.abs(buf[i]-128));peak=Math.max(peak,m);$("#lvl").style.width=Math.min(100,m*2.5)+"%";if(v>2){const h=$("#recHint");if(peak<4)h.textContent=t("silent");else if(h.textContent===t("silent"))h.textContent=t("go")}}if(v>=15)stopRec()},100)}
+function stopRec(){clearInterval(timer);stopSR();stopMeter();if(mr&&mr.state!=="inactive")mr.stop()}
+$("#recBtn").onclick=()=>state==="rec"?stopRec():startRec();
+$("#uplBtn").onclick=()=>$("#file").click();
+$("#file").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const a=new Audio(URL.createObjectURL(f));let ok=false;a.onloadedmetadata=()=>{ok=true;a.duration>16?toast(t("long")):finishTake(f)};a.onerror=()=>{if(!ok)finishTake(f)}};
+$("#prev").onclick=()=>{stopPlay();blob&&(audio=new Audio(URL.createObjectURL(blob)),audio.play().catch(()=>{}))};
+$("#redo").onclick=()=>{REC.rerec--;stopPlay();resetRec()};
+$("#rtext").oninput=()=>{REC.edited=true};
+$("#post").onclick=()=>{stopPlay();REC.cb(blob,$("#rtext").value.trim())};
+$("#recBack").onclick=()=>{if(state==="rec")abortRec();show(REC.back||"home")};
+$("#goRec").onclick=()=>{const sl=slot;openRec(iName(dIdx),b=>{if(sl!==slot){toast(t("late"));show("home");return}const last=S.hist[0];S.streak=last&&last.slot===sl-1?S.streak+1:1;S.posted=true;S.hist.unshift({idx:dIdx,slot:sl,rank:null});toast(t("ptoast"));show("feed")},"home",twistText())};
+$("#goFeed").onclick=()=>show("feed");
+/* feed */
+let queue=[];
+function renderFeed(){const st=$("#stack"),vb=$("#vbtns");$("#sold").textContent=t("sold");$("#dead").textContent=t("dead");
+ if(!S.posted){$("#feedTag").textContent=iName(dIdx)+".";st.innerHTML=`<div class="card">${t("locked")}</div><button class="btn" id="lk">${t("pitch")}</button>`;vb.hidden=true;$("#lk").onclick=()=>$("#goRec").click();return}
+ $("#feedTag").textContent=iName(dIdx)+".";queue=S.pitches.filter(p=>!p.voted&&!p.reported).sort(()=>Math.random()-.5);next()}
+function next(){const st=$("#stack"),vb=$("#vbtns"),p=queue[0];
+ if(!p){st.innerHTML=`<div class="card">${t("empty")}</div>`;vb.hidden=true;return}
+ vb.hidden=false;if(p.vi===undefined)p.vi=VN++;
+ st.innerHTML=`<div class="card" id="cur"><div class="row"><button class="play" aria-label="Play">▶</button><div class="wave">${p.w.map(h=>`<i style="height:${h}%"></i>`).join("")}</div></div><div class="small" style="margin-top:10px">${t("anon",queue.length)}</div>${txt(p.text,1)}<span class="stamp" id="stS" style="right:14px;color:#2a8a00">${t("sold")}</span><span class="stamp" id="stD" style="left:14px;color:var(--red)">${t("dead")}</span><button class="link" id="rep">${t("report")}</button></div><p class="small" style="text-align:center">${t("swipe")}</p>`;
+ const c=$("#cur");c.querySelector(".play").onclick=e=>play(p,e.target);
+ $("#rep").onclick=()=>{p.reported=true;queue.shift();toast(t("reported"));stopPlay();next()};
+ let x0=null,dx=0;
+ c.onpointerdown=e=>{if(e.target.closest("button,summary,details"))return;x0=e.clientX;c.setPointerCapture(e.pointerId)};
+ c.onpointermove=e=>{if(x0===null)return;dx=e.clientX-x0;c.style.transform=`translateX(${dx}px) rotate(${dx/25}deg)`;$("#stS").style.opacity=dx>0?Math.min(1,dx/90):0;$("#stD").style.opacity=dx<0?Math.min(1,-dx/90):0};
+ c.onpointerup=()=>{if(x0===null)return;x0=null;if(dx>90)vote(true);else if(dx<-90)vote(false);else{c.style.transform="";$("#stS").style.opacity=$("#stD").style.opacity=0}dx=0}}
+function vote(s){const p=queue.shift();if(!p)return;stopPlay();p.voted=true;s?p.sold++:p.dead++;S.votes++;next()}
+$("#sold").onclick=()=>vote(true);$("#dead").onclick=()=>vote(false);
+/* results, top, profile */
+function renderResults(){$("#yItem").textContent=t("ritem",iName(yIdx));
+ const g=rng(slot-1),pool=NAMES.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(g()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ const rows=[0,1,2].map(i=>[pool[i],300+Math.floor(g()*200),20+Math.floor(g()*50)]).sort((a,b)=>b[1]-a[1]);
+ $("#podium").innerHTML=rows.map((r,i)=>`<div class="card row"><b style="font-size:26px;color:var(--red);width:30px">${i+1}</b><div>${r[0]}<div class="small">${t("pct",Math.round(r[1]/(r[1]+r[2])*100),r[1]+r[2])}</div></div></div>`).join("");
+ const h=S.hist.find(x=>x.slot===slot-1),box=$("#mine");
+ if(h){box.style.display="block";box.textContent=h.rank?t("rrank",h.rank):t("rpend")}else box.style.display="none"}
+$("#ff").onclick=()=>{off+=HOUR;rollover();show("results")};
+function renderTop(){const l=weekly.slice().sort((a,b)=>wilson(b[3],b[3]+b[4])-wilson(a[3],a[3]+a[4]));
+ $("#topList").innerHTML=l.map((p,i)=>`<div class="card row"><b style="font-size:22px;color:var(--red);width:28px">${i+1}</b><div style="flex:1"><b>${iName(p[1])}</b><div class="small">${p[0]} · ${t("pct",Math.round(p[3]/(p[3]+p[4])*100),p[3]+p[4])}</div>${txt(p[2])}</div><button class="play" style="width:48px;height:48px" data-i2="${i}" aria-label="Play">▶</button></div>`).join("");
+ $$("[data-i2]").forEach(b=>b.onclick=()=>play({text:l[b.dataset.i2][2]},b))}
+function renderMe(){$("#nick").textContent=S.nick;$("#acct").textContent=S.user?t("signedas",S.user.email||S.nick):t("anonacct");$("#acctBtn").textContent=S.user?t("signout"):t("signin");$("#stStreak").textContent=S.streak;$("#stWins").textContent=S.wins;$("#stVotes").textContent=S.votes;
+ $("#hist").innerHTML=S.hist.length?S.hist.map(h=>`<div class="card"><b>${iName(h.idx)}</b><div class="small">${h.rank?t("rank",h.rank):t("inplay")}</div></div>`).join(""):`<div class="card small">${t("nohist")}</div>`}
+$("#nickIn").onchange=e=>{const v=e.target.value.trim();if(v){S.nick=v;e.target.value="";renderMe();toast(t("saved"))}};
+$("#theme").onclick=()=>{const d=getComputedStyle(document.body).backgroundColor==="rgb(16, 16, 16)";document.documentElement.dataset.theme=d?"light":"dark"};
+$("#resLink").onclick=()=>show("results");
+/* friends: pass-and-play */
+let F={ph:"setup",pl:[],i:0,v:0},CH={};
+function renderFriends(){const b=$("#fbody");
+ if(F.ph==="setup"){
+  b.innerHTML=`<p class="tag">${t("fsub")}</p><div class="row"><input id="fn" maxlength="14" placeholder="${t("fname")}" aria-label="${t("fname")}"><button class="btn sm" id="fa" style="flex:none;padding:0 18px">${t("fadd")}</button></div><div id="chips" style="margin:8px 0">${F.pl.map((p,i)=>`<span class="chip">${esc(p.name)}<button data-x="${i}" aria-label="Remove">×</button></span>`).join("")}</div><button class="btn" id="fs">${t("fstart")}</button><p class="small">${t("fnote")}</p>`;
+  const add=()=>{const v=$("#fn").value.trim();if(v&&F.pl.length<6){F.pl.push({name:v,score:0});renderFriends();$("#fn").focus()}};
+  $("#fa").onclick=add;$("#fn").onkeydown=e=>e.key==="Enter"&&add();
+  $$("[data-x]").forEach(x=>x.onclick=()=>{F.pl.splice(+x.dataset.x,1);renderFriends()});
+  $("#fs").onclick=()=>{if(F.pl.length<3){toast(t("fmin"));return}
+   const pool=Array.from({length:lang==="en"?ITEMS.length:30},(_,i)=>i).sort(()=>Math.random()-.5);
+   F.pl.forEach((p,i)=>{p.item=iName(pool[i]);p.score=0;p.url=null});F.ph="turn";F.i=0;renderFriends()}}
+ else if(F.ph==="turn"){const p=F.pl[F.i];
+  b.innerHTML=`<p class="tag">${t("fpass",esc(p.name))}</p><div class="small">${t("fword")}</div><div class="item">${esc(p.item)}.</div><button class="btn" id="fr">${t("fready")}</button>`;
+  $("#fr").onclick=()=>openRec(p.item,(bl,tx)=>{p.url=URL.createObjectURL(bl);p.text=tx;F.i++;if(F.i>=F.pl.length){F.ph="vote";F.v=0}show("friends")},"friends")}
+ else if(F.ph==="vote"){CH={};const me=F.pl[F.v];
+  b.innerHTML=`<p class="tag"><b>${t("fvote",esc(me.name))}</b><br>${t("fvsub")}</p>${F.pl.map((p,i)=>i===F.v?"":`<div class="card"><div class="row"><button class="play" data-pi="${i}" aria-label="Play">▶</button><b style="flex:1">${esc(p.item)}</b></div>${txt(p.text)}<div class="row" style="margin-top:10px"><button class="btn sm g" data-b="${i}">${t("best")}</button><button class="btn sm g" data-w="${i}">${t("worst")}</button></div></div>`).join("")}<button class="btn" id="fsub" disabled>${t("submit")}</button>`;
+  const upd=()=>{$$("[data-b]").forEach(x=>x.classList.toggle("sel",+x.dataset.b===CH.b));$$("[data-w]").forEach(x=>x.classList.toggle("sel",+x.dataset.w===CH.w));$("#fsub").disabled=CH.b===undefined||CH.w===undefined};
+  $$("[data-pi]").forEach(x=>x.onclick=()=>play(F.pl[x.dataset.pi],x));
+  $$("[data-b]").forEach(x=>x.onclick=()=>{CH.b=+x.dataset.b;if(CH.w===CH.b)CH.w=undefined;upd()});
+  $$("[data-w]").forEach(x=>x.onclick=()=>{CH.w=+x.dataset.w;if(CH.b===CH.w)CH.b=undefined;upd()});
+  $("#fsub").onclick=()=>{stopPlay();F.pl[CH.b].score++;F.pl[CH.w].score--;F.v++;if(F.v>=F.pl.length)F.ph="res";renderFriends();$("main").scrollTop=0}}
+ else{const r=F.pl.slice().sort((a,b)=>b.score-a.score);
+  b.innerHTML=`<p class="tag">${t("fres")}</p>${r.map((p,i)=>`<div class="card row"><b style="font-size:22px;color:var(--red);width:28px">${i+1}</b><div style="flex:1"><b>${esc(p.name)}</b><div class="small">${esc(p.item)} · ${t("pts",p.score)}</div>${txt(p.text)}</div><button class="play" style="width:48px;height:48px" data-pi="${F.pl.indexOf(p)}" aria-label="Play">▶</button></div>`).join("")}<button class="btn" id="fnw">${t("fnew")}</button>`;
+  $$("[data-pi]").forEach(x=>x.onclick=()=>play(F.pl[x.dataset.pi],x));
+  $("#fnw").onclick=()=>{F={ph:"setup",pl:F.pl.map(p=>({name:p.name,score:0})),i:0,v:0};renderFriends()}}}
+/* nav, language, welcome */
+$$("#nav button").forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.addEventListener("click",e=>{const b=e.target.closest(".lg");if(b){lang=b.dataset.l;applyLang()}});
+/* auth: paste your Firebase web config into FIREBASE_CONFIG to turn on Google and email sign-in */
+const FIREBASE_CONFIG={
+  apiKey: "AIzaSyB6hAXpth6TiV99GYmvH_bn7pF8jV5JTnY",
+  authDomain: "sell-or-die.firebaseapp.com",
+  projectId: "sell-or-die",
+  storageBucket: "sell-or-die.firebasestorage.app",
+  messagingSenderId: "770834260483",
+  appId: "1:770834260483:web:39eeda3bfb55c8e5d0a436",
+  measurementId: "G-42WHKYY0MM"
+};
+let AUTH=null;
+try{if(window.firebase&&FIREBASE_CONFIG){firebase.initializeApp(FIREBASE_CONFIG);AUTH=firebase.auth()}}catch(e){AUTH=null}
+const nickFrom=u=>(u.displayName||(u.email||"Player").split("@")[0]).slice(0,16);
+function enter(){$("#wel").hidden=true;show("home")}
+$("#wgo").onclick=()=>{const v=$("#wnick").value.trim();if(v)S.nick=v;enter()};
+$("#wg").onclick=()=>{if(!AUTH){toast(t("noauth"));return}AUTH.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{if(e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request")toast(e.code||"Error")})};
+$("#we").onclick=()=>{if(!AUTH){toast(t("noauth"));return}$("#emb").hidden=false;$("#wem").focus()};
+$("#wsend").onclick=()=>{const em=$("#wem").value.trim();if(!/^\S+@\S+\.\S+$/.test(em)){toast(t("bademail"));return}
+ AUTH.sendSignInLinkToEmail(em,{url:location.origin+location.pathname,handleCodeInApp:true}).then(()=>{try{localStorage.setItem("sod_email",em)}catch(e){}toast(t("linksent"))}).catch(e=>toast(e.code||"Error"))};
+$("#acctBtn").onclick=()=>{if(S.user&&AUTH){AUTH.signOut();S.nick="Anon"+(100+Math.floor(Math.random()*900))}S.user=null;$("#wel").hidden=false};
+if(AUTH){
+ AUTH.onAuthStateChanged(u=>{if(!u)return;S.user=u;S.nick=nickFrom(u);if(!$("#wel").hidden)enter();else renderMe()});
+ if(AUTH.isSignInWithEmailLink(location.href)){let em="";try{em=localStorage.getItem("sod_email")||""}catch(e){}if(!em)em=prompt(t("askemail"))||"";
+  if(em)AUTH.signInWithEmailLink(em,location.href).then(()=>{try{localStorage.removeItem("sod_email")}catch(e){}history.replaceState(null,"",location.pathname)}).catch(e=>toast(e.code||"Error"))}}
+$("#share").onclick=async()=>{const msg=t("sharetxt",iName(dIdx),twistText()),url=location.href.split("#")[0];
+ try{if(navigator.share){await navigator.share({title:"Sell or Die",text:msg,url});return}}catch(e){if(e&&e.name==="AbortError")return}
+ try{await navigator.clipboard.writeText(msg+" "+url);toast(t("copied2"))}catch(e){toast(msg)}};
+applyLang();
+</script>
+</body>
+</html>
